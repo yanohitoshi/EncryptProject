@@ -27,9 +27,9 @@ private:
 	string writeFileName;
 
 	// 開いたファイルの情報を読み込むファイル
-	ifstream ifsFile;
+	ifstream* ifsFile;
 	// 書き出しを行うファイル
-	ofstream ofsFile;
+	ofstream* ofsFile;
 
 	//読み込みデータ
 	// ifsをコピーする箱

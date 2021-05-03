@@ -8,11 +8,15 @@ Encrypt::Encrypt(char* _openFileName, char* _writeFileName)
 
 Encrypt::~Encrypt()
 {
+    // 後片付け
+    delete ifsFile;
+    delete ofsFile;
+
 }
 
 bool Encrypt::OpenFile()
 {
-    ifsFile.open(openFileName, ios::binary);
+    ifsFile = new ifstream(openFileName, ios::binary);
 
     if (!ifsFile)
     {
@@ -24,15 +28,14 @@ bool Encrypt::OpenFile()
 
 void Encrypt::FirstWriteEncrypt()
 {
-
     // 何も書かれていないファイルを出力
-    ofstream ofs(writeFileName, ios::app | ios::binary);
+    ofsFile = new ofstream(writeFileName, ios::app | ios::binary);
 
     // 初期化ベクトル作成
     memset(initialData, 'I', Block);
 
     // データの読み込み
-    ifsFile.read(data, Block);
+    ifsFile->read(data, Block);
 
     //ブロック長ごとに処理
     for (int i = 0; i < Block; i++)
@@ -44,7 +47,7 @@ void Encrypt::FirstWriteEncrypt()
     cipher(cipherBlock);
 
     //暗号化したブロックを出力
-    ofsFile.write(cipherBlock, Block);
+    ofsFile->write(cipherBlock, Block);
 
     //1つ前の暗号ブロックに暗号化したブロックを格納
     memcpy(cipherBlockPre, cipherBlock, Block);
@@ -56,7 +59,7 @@ void Encrypt::AllWriteEncrypt()
     do {
 
         //データ読込
-        ifsFile.read(data, Block);
+        ifsFile->read(data, Block);
 
         //ブロック長ごとに処理
         for (int i = 0; i < Block; i++)
@@ -68,12 +71,12 @@ void Encrypt::AllWriteEncrypt()
         cipher(cipherBlock);
 
         //暗号化したブロックを出力
-        ofsFile.write(cipherBlock, Block);
+        ofsFile->write(cipherBlock, Block);
 
         //1つ前の暗号ブロックに暗号化したブロックを格納
         memcpy(cipherBlockPre, cipherBlock, Block);
 
-    } while (!ifsFile.eof());
+    } while (!ifsFile->eof());
 
 }
 
