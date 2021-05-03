@@ -2,9 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-//#include <string>
-//#include <stdio.h>
-//#include <sstream>
 
 #define Block 1
 
@@ -18,8 +15,8 @@ public:
 	Encrypt(char* _openFileName, char* _writeFileName);
 	~Encrypt();
 	bool OpenFile();
-	void CreateEncryptData();
-	void WriteFile();
+	void FirstWriteEncrypt();
+	void AllWriteEncrypt();
 private:
 	
 	void cipher(char* dst);

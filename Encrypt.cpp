@@ -22,7 +22,7 @@ bool Encrypt::OpenFile()
     return true;
 }
 
-void Encrypt::CreateEncryptData()
+void Encrypt::FirstWriteEncrypt()
 {
 
     // 何も書かれていないファイルを出力
@@ -51,7 +51,7 @@ void Encrypt::CreateEncryptData()
 
 }
 
-void Encrypt::WriteFile()
+void Encrypt::AllWriteEncrypt()
 {
     do {
 
