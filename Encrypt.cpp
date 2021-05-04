@@ -16,10 +16,12 @@ Encrypt::~Encrypt()
 
 bool Encrypt::OpenFile()
 {
+    cout << openFileName << endl;
     ifsFile = new ifstream(openFileName, ios::binary);
 
     if (!ifsFile)
     {
+        cout << "ファイルが開けませんでした。" << endl;
         return false;
     }
 

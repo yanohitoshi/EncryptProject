@@ -44,5 +44,6 @@ private:
 	//ˆÃ†ƒuƒƒbƒN
 	char cipherBlock[Block];
 
+
 };
 
