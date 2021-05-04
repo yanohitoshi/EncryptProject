@@ -1,9 +1,22 @@
+//参考文献(URL長いものもあります。申し訳ありません)
 //http://yohshiy.blog.fc2.com/blog-entry-260.html
 //https://qiita.com/p1ro3/items/6bb1c78a6c27109f6b93
 //https://qiita.com/asksaito/items/1793b8d8b3069b0b8d68
+//https://qiita.com/omiso/items/6082b765c1257b71985b
+//http://www.spiritek.co.jp/spkblog/2016/12/01/%E6%9A%97%E5%8F%B7%E6%8A%80%E8%A1%93%E5%85%A5%E9%96%8004-%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E6%9A%97%E5%8F%B7%E3%81%AE%E3%83%A2%E3%83%BC%E3%83%89%E3%80%9C%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF/
+//https://programming.pc-note.net/c/commandline.html
 
 #include <iostream>
 #include "Encrypt.h"
+
+enum ArgumentName
+{
+    PASS = 0,
+    FIRST = 1,
+    SECOND = 2,
+    THIRD = 3,
+    FOURTH = 4
+};
 
 bool ChackArgument(int _count,char* argv, bool _isAbridgementOption);
 
@@ -27,7 +40,7 @@ int main(int argc, char* argv[])
     }
 
     // オプションが省略して使われているかチェックフラグ変数
-    string firstArg = argv[1];
+    string firstArg = argv[FIRST];
     bool isAbridgementOption = false;
 
     if (firstArg == "-oi" || firstArg == "-io")
@@ -60,6 +73,7 @@ int main(int argc, char* argv[])
     {
         argumentChack = ChackArgument(chackCount, argv[chackCount], isAbridgementOption);
 
+        // デバッグ出力
         cout << "argumentChack" << endl;
         cout << argumentChack << endl;
     }
@@ -75,11 +89,13 @@ int main(int argc, char* argv[])
     if (argumentChack)
     {
         Encrypt* encrypt;
+        // デバッグ出力
         if (isFirstInput)
         {
             cout << "入力が先" << endl;
         }
 
+        // デバッグ出力
         if (isAbridgementOption)
         {
             cout << "省略" << endl;
@@ -89,22 +105,22 @@ int main(int argc, char* argv[])
         {
             if (isAbridgementOption)
             {
-                encrypt = new Encrypt(argv[2], argv[3]);
+                encrypt = new Encrypt(argv[SECOND], argv[THIRD]);
             }
             else
             {
-                encrypt = new Encrypt(argv[2], argv[4]);
+                encrypt = new Encrypt(argv[SECOND], argv[FOURTH]);
             }
         }
         else
         {
             if (isAbridgementOption)
             {
-                encrypt = new Encrypt(argv[3], argv[2]);
+                encrypt = new Encrypt(argv[THIRD], argv[SECOND]);
             }
             else
             {
-                encrypt = new Encrypt(argv[4], argv[2]);
+                encrypt = new Encrypt(argv[FOURTH], argv[SECOND]);
             }
         }
 
@@ -154,7 +170,9 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
 
         switch (_count) 
         {
-        case 1:
+        case FIRST:
+
+            // デバッグ出力
             cout << "case1" << endl;
             cout << chackArgument <<endl;
             // オプションが入って無ければエラーを返す
@@ -169,7 +187,9 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
             erroeChack = true;
             break;
 
-        case 2:
+        case SECOND:
+
+            // デバッグ出力
             cout << "case2" << endl;
             cout << chackArgument << endl;
             // オプションが入っていたらエラーを返す
@@ -184,8 +204,9 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
             erroeChack = true;
             break;
 
-        case 3:
+        case THIRD:
 
+            // デバッグ出力
             cout << "case3" << endl;
             cout << chackArgument << endl;
             cout << _isAbridgementOption << endl;
@@ -207,7 +228,9 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
             erroeChack = true;
             break;
 
-        case 4:
+        case FOURTH:
+
+            // デバッグ出力
             cout << "case4" << endl;
             cout << chackArgument << endl;
             // オプションが入っていたらエラーを返す
