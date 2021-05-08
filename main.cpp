@@ -1,24 +1,30 @@
-//参考文献(URL長いものもあります。申し訳ありません)
-//http://yohshiy.blog.fc2.com/blog-entry-260.html
-//https://qiita.com/p1ro3/items/6bb1c78a6c27109f6b93
-//https://qiita.com/asksaito/items/1793b8d8b3069b0b8d68
-//https://qiita.com/omiso/items/6082b765c1257b71985b
-//http://www.spiritek.co.jp/spkblog/2016/12/01/%E6%9A%97%E5%8F%B7%E6%8A%80%E8%A1%93%E5%85%A5%E9%96%8004-%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E6%9A%97%E5%8F%B7%E3%81%AE%E3%83%A2%E3%83%BC%E3%83%89%E3%80%9C%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF/
-//https://programming.pc-note.net/c/commandline.html
 
 #include <iostream>
 #include "Encrypt.h"
 
+
+/*
+@enum 何番目の引数なのか判別するためのnameTag
+*/
 enum ArgumentName
 {
     PASS = 0,
     FIRST = 1,
     SECOND = 2,
     THIRD = 3,
-    FOURTH = 4
+    FOURTH = 4,
+    OVER = 5
 };
 
-bool ChackArgument(int _count,char* argv, bool _isAbridgementOption);
+/*
+@brief	コマンドライン引数チェックする関数
+@param _count　何番目の引数なのかの数
+@param _argv　文字列のポインタ
+@param	_isAbridgementOption　省略されているかのフラグ
+@return true : 成功 , false : 失敗
+*/
+bool ChackArgument(int _count,char* _argv, bool _isAbridgementOption);
+
 
 int main(int argc, char* argv[])
 {
@@ -31,7 +37,7 @@ int main(int argc, char* argv[])
         getchar();
         return 0;
     }
-    else if (argc > 5)
+    else if (argc > OVER) // 引数が必要以上に入っていないか
     {
         cout << "ERROR::コマンドライン引数が許容範囲を超えています::ERROR" << endl;
         cout << "Enterキーで終了" << endl;
@@ -41,11 +47,16 @@ int main(int argc, char* argv[])
 
     // オプションが省略して使われているかチェックフラグ変数
     string firstArg = argv[FIRST];
+
+    // 省略チェック用フラグ
     bool isAbridgementOption = false;
 
+    // 1つ目の変数に省略オプションが入っているかチェック
     if (firstArg == "-oi" || firstArg == "-io")
     {
+        // 省略されていたら省略チェック用フラグをtrue
         isAbridgementOption = true;
+        // この場合にコマンドライン引数が必要以上に入っていたらエラー通知後終了
         if (argc > 4)
         {
             cout << "ERROR::オプションに対して引数が多いです::ERROR" << endl;
@@ -56,6 +67,9 @@ int main(int argc, char* argv[])
     }
     else if (firstArg == "-i" || firstArg == "-o")
     {
+        // 省略されていなかったら省略チェック用フラグをfalse
+        isAbridgementOption = false;
+        // この場合にコマンドライン引数が必要以上に入っていたらエラー通知後終了
         if (argc <= 4)
         {
             cout << "ERROR::オプションに対して引数が少ないです::ERROR" << endl;
@@ -71,79 +85,82 @@ int main(int argc, char* argv[])
     // 全コマンドライン引数をチェック
     for (int chackCount = 1; chackCount < argc; chackCount++)
     {
+        // trueもしくはfalseを返すコマンドライン引数をチェック関数呼び出し
         argumentChack = ChackArgument(chackCount, argv[chackCount], isAbridgementOption);
-
-        // デバッグ出力
-        cout << "argumentChack" << endl;
-        cout << argumentChack << endl;
     }
 
-    // 先に入力ファイル名が入っているかどうか
+    // 先に入力ファイル名が入っているかフラグ
     bool isFirstInput = false;
 
+    // 入力オプションが先に来ているかチェック
     if (firstArg == "-i" || firstArg == "-io")
     {
+        // 入力オプションが先に入っていたらフラグをtrue
         isFirstInput = true;
     }
 
+    // 変数チェックが成功していたら
     if (argumentChack)
     {
+        // 暗号化クラスのポインタ
         Encrypt* encrypt;
-        // デバッグ出力
+
+        // 入力が先に来ていたら
         if (isFirstInput)
         {
-            cout << "入力が先" << endl;
-        }
-
-        // デバッグ出力
-        if (isAbridgementOption)
-        {
-            cout << "省略" << endl;
-        }
-
-        if (isFirstInput)
-        {
+            // 省略されていたら
             if (isAbridgementOption)
             {
                 encrypt = new Encrypt(argv[SECOND], argv[THIRD]);
             }
-            else
+            else // 省略されていなかったら
             {
                 encrypt = new Encrypt(argv[SECOND], argv[FOURTH]);
             }
         }
-        else
+        else // 入力が後に来ていたら
         {
+            // 省略されていたら
             if (isAbridgementOption)
             {
                 encrypt = new Encrypt(argv[THIRD], argv[SECOND]);
             }
-            else
+            else // 省略されていなかったら
             {
                 encrypt = new Encrypt(argv[FOURTH], argv[SECOND]);
             }
         }
 
+        // ファイルを開く関数を呼び出す
+        // ファイルが開けていたらtrueを変えす
         bool success = encrypt->OpenFile();
 
+        // 成功していたら
         if (success)
         {
+            // 初期化ベクトルと最初の暗号文の生成
             encrypt->FirstWriteEncrypt();
+
+            // 残りの全暗号化を暗号化する関数を呼び出す
             encrypt->AllWriteEncrypt();
 
+            // ポインタの後処理
             delete encrypt;
 
+            // 終了通知
             cout << "終了しました。" << endl;
 
+            // 終了
             return 0;
         }
         else
         {
 
+            // キー入力で終了をコンソール描画
             cout << "Enterキーで終了" << endl;
-
             getchar();
 
+            // ポインタの後処理
             delete encrypt;
 
             return 0;
@@ -154,27 +171,30 @@ int main(int argc, char* argv[])
 
 bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
 {
+    // nullチェック用フラグ
     bool nullChack = false;
 
+    // nullじゃなかったら
     if (_argv != nullptr)
     {
+        // nullチェック用フラグをtrueに
         nullChack = true;
     }
 
+    // エラーチェック用フラグ
     bool erroeChack = false;
 
+    // nullチェックがtrueだったら
     if (nullChack)
     {
         // コマンドライン引数のチェック用string変数
         string chackArgument = _argv;
 
+        // 何個目の引数なのかを見る
         switch (_count) 
         {
         case FIRST:
 
-            // デバッグ出力
-            cout << "case1" << endl;
-            cout << chackArgument <<endl;
             // オプションが入って無ければエラーを返す
             if (chackArgument != "-o" && chackArgument != "-i" &&
                 chackArgument != "-oi" && chackArgument != "-io")
@@ -182,16 +202,18 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
                 cout << "ERROR::オプションを入力してください::ERROR" << endl;
                 cout << "Enterキーで終了" << endl;
                 getchar();
+
+                // エラーフラグをfalse
                 erroeChack = false;
             }
+
+            // エラーフラグをtrue
             erroeChack = true;
+
             break;
 
         case SECOND:
 
-            // デバッグ出力
-            cout << "case2" << endl;
-            cout << chackArgument << endl;
             // オプションが入っていたらエラーを返す
             if (chackArgument == "-o" || chackArgument == "-i" ||
                 chackArgument == "-oi" || chackArgument == "-io")
@@ -199,18 +221,19 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
                 cout << "ERROR::ファイル名を入力してください::ERROR" << endl;
                 cout << "Enterキーで終了" << endl;
                 getchar();
+
+                // エラーフラグをfalse
                 erroeChack = false;
             }
+
+            // エラーフラグをtrue
             erroeChack = true;
+
             break;
 
         case THIRD:
 
-            // デバッグ出力
-            cout << "case3" << endl;
-            cout << chackArgument << endl;
-            cout << _isAbridgementOption << endl;
-
+            // 省略されていなかったら
             if (!_isAbridgementOption)
             {
                 // オプションが入って無ければエラーを返す
@@ -220,19 +243,20 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
                     cout << "ERROR::オプションを入力してください::ERROR" << endl;
                     cout << "Enterキーで終了" << endl;
                     getchar();
+
+                    // エラーフラグをfalse
                     erroeChack = false;
                 }
 
             }
 
+            // エラーフラグをtrue
             erroeChack = true;
+
             break;
 
         case FOURTH:
 
-            // デバッグ出力
-            cout << "case4" << endl;
-            cout << chackArgument << endl;
             // オプションが入っていたらエラーを返す
             if (chackArgument == "-o" || chackArgument == "-i" ||
                 chackArgument == "-oi" || chackArgument == "-io")
@@ -240,13 +264,17 @@ bool ChackArgument(int _count, char* _argv,bool _isAbridgementOption)
                 cout << "ERROR::ファイル名を入力してください::ERROR" << endl;
                 cout << "Enterキーで終了" << endl;
                 getchar();
+                // エラーフラグをfalse
                 erroeChack = false;
             }
+
+            // エラーフラグをtrue
             erroeChack = true;
             break;
         }
     }
 
+    // 成功もしくは失敗を返す
     return erroeChack;
 
 }
