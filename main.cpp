@@ -163,6 +163,7 @@ int main(int argc, char* argv[])
             // ポインタの後処理
             delete encrypt;
 
+            // 終了
             return 0;
         }
     }
